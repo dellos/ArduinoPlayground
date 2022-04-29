@@ -53,3 +53,7 @@ void Queue::resetQueue(){
     front = -1;
     rear = -1;
 }
+//return not using bytes
+int Queue::capacity(){
+    return abs(front-rear);
+}

@@ -53,21 +53,15 @@ void SerialController::pause(char flg){
 //same as pause but do clearnup buffer
 void SerialController::stop(char flg){
     pause(flg);
-    if(flg == 'a'){
-        rxBuffer->resetQueue();
-        txBuffer->resetBuffer();
-    }
-    else if(flg == 'r'){
-        rxBuffer->resetBuffer();
-    }
-    else if(flg == 't'){
-        txBuffer->resetBuffer();
-    }
+    resetBuffer(flg);
 }
 //write array to TxBuffer
 //if give array bigger than TxBuffer return False
 bool SerialController::writeBuffer(uint8_t dat[]) {
-    int arrSize = *(&dat + 1) - dat;)
+    int arrSize = *(&dat + 1) - dat;
+    if(txBuffer->capacity() > arrSize){
+        foreach()
+    }
 }
 
 //Read RxBuffer, cleanup readed bytes

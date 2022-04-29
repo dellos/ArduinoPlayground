@@ -17,4 +17,5 @@ class Queue{
     bool isFull();
     bool isEmpty();
     void resetQueue();
+    int capacity();
 };
