@@ -2,7 +2,7 @@
 
 #include "serial.h"
 //write a byte for TxBuffer to hardware buffer regist->UDR0
-//note that disable transmitt will not stop ongoing transmit (shift register and RXB register data will still transmit to end)
+
 void SerialController::write(){
     if(txBuffer->isEmpty()){
         //stop transmit? or set data to notifi outer device their is no data
@@ -32,17 +32,37 @@ void SerialController::read(){
         rxBuffer->enQueue(dat); //write to buffer
     }
 }
+//Note: that disable transmitt will not stop ongoing transmit (shift register and RXB register data will still transmit to end)
+//Note: disable reciver will be immediate, ongoing data will lost
 //pause Recive: flg = "r"
 //pause All: flg = "a"
 //Pause Tranmite = "t"
 // not clear buffer in 3 mode
 //set back last byte before pause
 void SerialController::pause(char flg){
-
+    if(flg == 'a'){
+        UCSR0B &= ~((1<<RXEN0) |(1<<TXEN0));
+    }
+    else if(flg == 'r'){
+        UCSR0B &= ~(1<<RXEN0);
+    }
+    else if(flg == 't'){
+        UCSR0B &= ~(1<<TXEN0);
+    }
 }
 //same as pause but do clearnup buffer
 void SerialController::stop(char flg){
-
+    pause(flg);
+    if(flg == 'a'){
+        rxBuffer->resetQueue();
+        txBuffer->resetBuffer();
+    }
+    else if(flg == 'r'){
+        rxBuffer->resetBuffer();
+    }
+    else if(flg == 't'){
+        txBuffer->resetBuffer();
+    }
 }
 //write array to TxBuffer
 //if give array bigger than TxBuffer return False
