@@ -7,57 +7,63 @@
     ATMega is 32 bit microprocessor
 */
 #define __AVR_ATmega2560__ //must define to use right io.h 
+#define BAUD 115200UL
+#define F_CPU 16000000UL
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include "queue.h"
+// #include "queue.h"
 #include "serial.h"
+#include <Arduino.h>
+#include <LiquidCrystal_I2C.h>
+#include <util/setbaud.h>
+//#include <Wire.h>
 
-#define DoubleBaudRate
-#define BAUD_RATE 115200
-SerialController *serial;
-void timerInit(){
-   
+#define DoubleBaudRate 1
 
-    TCNT1 = 0;   
-    OCR1A = 24999; // set interver
-    //set CTC
-    TCCR1A = 0;
-    TCCR1B |= (1 << WGM12); 
-    TCCR1B |= (0<<CS12) |(0 << CS11)|(1 << CS10); //no rescaler
-    
-}
+SerialController serial = SerialController(128,128,UBRRL_VALUE,UBRRH_VALUE,USE_2X);
+LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27,16,2);
+
 void serialInit(){
-    serial = new SerialController(128,128,F_CPU,BAUD_RATE);
 
+    serial.init(UBRRL_VALUE,UBRRH_VALUE,USE_2X);
 }
 //int queue for value
 void bufferInit(){
 
 }
 
-void setup(){
-    timerInit();
-    serialInit();
-}
-
-void loop(){
-
-}
-
-ISR(TIMER1_COMPA_vect){
+void lcdInit(){
+    lcd.init();                      // initialize the lcd 
+    // Print a message to the LCD.
+    lcd.backlight();
+    lcd.setCursor(16,0);
+    lcd.autoscroll();
+    lcd.print("123");
     
+}
+
+void setup(){
+   
+    serialInit();
+    lcdInit();
+}
+volatile char c;
+void loop(){
+    // display each character to the LCD
+    c = serial.readBuffer();
+    if(c != '\0'){
+        serial.writeBuffer(c);
+        lcd.print(c);
+        c = '\0';
+    }
 }
 
 // call when txb is empty and can set new byte
-ISR(UART0_UDRE_vect){
-   serial->write(); 
-}
+ISR(USART0_UDRE_vect){
+    serial.write(); 
+} 
 //call when all bit of Frame is shifted into RXB and rxb not read out 
-ISR(UART0_RX_vect){
-    serial->read(); //move to serial buffer
-}
-//call when all bit of frame is shift out of Shift Register and TXB is empty
-ISR(UART0_TX_vect){
-    
-}
-    
+ISR(USART0_RX_vect){
+    serial.read(); //move to serial buffer
+} 
+
