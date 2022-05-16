@@ -1,15 +1,14 @@
 
 #include "serial.h"
 
-
 SerialController::SerialController(int txBufferSize, int rxBufferSize, unsigned long ubrrl_value, unsigned long ubrrh_value, bool  isUse2x):
     rxBuffer(Queue(rxBufferSize)),
     txBuffer(Queue(txBufferSize))
 {
     _txBufferSize = txBufferSize;
     _rxBufferSize = rxBufferSize;
-    _txStatus = 'i';
-    _rxStatus = 'i';
+    _txStatus = SerialStatus::Inited;
+    _rxStatus = SerialStatus::Inited;
     //init(ubrrl_value,ubrrh_value,isUse2x); //dont setup hardware in Ctor
 }
 
@@ -18,7 +17,7 @@ SerialController::SerialController(int txBufferSize, int rxBufferSize, unsigned 
 void SerialController::write(){
     if(txBuffer.isEmpty()){
         //write null charr to be tranmit to outer
-        if( _txStatus == 'a') turnDataRegisterEmpty(false);
+        if( _txStatus == SerialStatus::Active) turnDataRegisterEmpty(false);
     }
     else{
 
@@ -62,61 +61,61 @@ void SerialController::read(){
 //Pause Tranmite = "t"
 // not clear buffer in 3 mode
 //set back last byte before pause
-void SerialController::pause(char flg){
-    if(flg == 'a'){
+void SerialController::pause(SerialPart flg){
+    if(flg == SerialPart::All){
         UCSR0B &= ~(1<<UDRIE0);
         UCSR0B &= ~((1<<RXEN0) |(1<<TXEN0));
-        _rxStatus = 'p';
-        _txStatus = 'p';
+        _rxStatus = SerialStatus::Pause;
+        _txStatus = SerialStatus::Pause;
     }
-    else if(flg == 'r'){
+    else if(flg == SerialPart::Rx){
         UCSR0B &= ~(1<<RXEN0);
-        _rxStatus = 'p';
+        _rxStatus = SerialStatus::Pause;
     }
-    else if(flg == 't'){
+    else if(flg == SerialPart::Tx){
         UCSR0B &= ~(1<<UDRIE0);
         UCSR0B &= ~(1<<TXEN0);
-        _txStatus = 'p';
+        _txStatus = SerialStatus::Pause;
     }
 }
 //same as pause but do clearnup buffer
-void SerialController::stop(char flg){
-    if(flg == 'a'){
+void SerialController::stop(SerialPart flg){
+    if(flg == SerialPart::All){
         UCSR0B &= ~(1<<UDRIE0);
         UCSR0B &= ~((1<<RXEN0) |(1<<TXEN0));
-        _rxStatus = 's';
-        _txStatus = 's';
+        _rxStatus = SerialStatus::Stop;
+        _txStatus = SerialStatus::Stop;
     }
-    else if(flg == 'r'){
+    else if(flg == SerialPart::Rx){
         UCSR0B &= ~(1<<RXEN0);
-        _rxStatus = 's';
+        _rxStatus = SerialStatus::Stop;
     }
-    else if(flg == 't'){
+    else if(flg == SerialPart::Tx){
         UCSR0B &= ~(1<<UDRIE0);
         UCSR0B &= ~(1<<TXEN0);
-        _txStatus = 's';
+        _txStatus = SerialStatus::Stop;
     }
 
     resetBuffer(flg);
     
 }
 //is it just simple set bit to 1 ? 
-void SerialController::resume(char flg){
+void SerialController::resume(SerialPart flg){
 
-     if(flg == 'a'){
+     if(flg == SerialPart::All){
         UCSR0B |= (1<<UDRIE0);
         UCSR0B |= (1<<RXEN0) |(1<<TXEN0);
-        _rxStatus = 'a';
-        _txStatus = 'a';
+        _rxStatus = SerialStatus::Active;
+        _txStatus = SerialStatus::Active;
     }
-    else if(flg == 'r'){
+    else if(flg == SerialPart::Rx){
         UCSR0B |= (1<<RXEN0);
-        _rxStatus = 'a';
+        _rxStatus = SerialStatus::Active;
     }
-    else if(flg == 't'){
+    else if(flg == SerialPart::Tx){
         UCSR0B |= (1<<UDRIE0);
         UCSR0B |= (1<<TXEN0);
-        _txStatus = 'a';
+        _txStatus = SerialStatus::Active;
     }
 }
 //write array to TxBuffer
@@ -131,7 +130,7 @@ bool SerialController::writeBuffer(uint8_t dat[]) {
         }
         result = true;
     }
-    if(_txStatus =='t'){
+    if(_txStatus == SerialStatus::Stop){
         turnDataRegisterEmpty(true);
     }
     return result;
@@ -142,7 +141,7 @@ bool SerialController::writeBuffer(uint8_t dat){
     if(txBuffer.capacity() > 0){
         txBuffer.enQueue(dat);
     }
-    if(_txStatus =='t'){
+    if(_txStatus == SerialStatus::Stop){
         turnDataRegisterEmpty(true);
     }
     return result;
@@ -172,15 +171,16 @@ void SerialController::readBufferByLenght(int lenght, uint8_t *inArray, int star
 //'t' : transmit
 //'r' : recives
 //set TxBuffer , RxBuffer to fornt , rear = -1 , -1
-void SerialController::resetBuffer(char flg){
-    if(flg == 'a'){
-        rxBuffer.capacity();
+void SerialController::resetBuffer(SerialPart flg){
+    if(flg == SerialPart::All){
+        rxBuffer.resetQueue();
+        txBuffer.resetQueue();
+
+    }
+    else if(flg == SerialPart::Tx){
         txBuffer.resetQueue();
     }
-    else if(flg == 't'){
-        txBuffer.resetQueue();
-    }
-    else if (flg =='r'){
+    else if (flg ==SerialPart::Rx){
         rxBuffer.resetQueue();
     }
 }
@@ -209,21 +209,39 @@ void SerialController::init(unsigned long ubrrl_value, unsigned long ubrrh_value
     UCSR0C = 0;
     UCSR0C |= (0<<UMSEL01) | (0<<UMSEL00); //Asynchronous
     UCSR0C |= (1<<UCSZ01)|(1<<UCSZ00); //8 bit USCZ02 is 0
-    UCSR0C |= (1<<UPM01) | (0<<UPM00); // even parity
-    UCSR0C |= (1<<USBS0); // 2 stop bit
+    //UCSR0C |= (1<<UPM01) | (0<<UPM00); // even parity
+   
+
+    //UCSR0C |= (1<<USBS0); // 2 stop bit
     //set status
-    _rxStatus = 'a';
-    _txStatus = 'a';
+    _rxStatus = SerialStatus::Active;
+    _txStatus = SerialStatus::Active;
     
 }
 //enable or disable TX hardware buffer register empty interupt
 void SerialController::turnDataRegisterEmpty(bool flag){
     if(flag == true){
         UCSR0B |= (1<<UDRIE0);
-        _txStatus = 'a';
+        _txStatus = SerialStatus::Active;
     }else{
         UCSR0B &= ~(1<<UDRIE0);
-        _txStatus = 't'; //stop interrupt
+        _txStatus = SerialStatus::Stop; //stop interrupt
     }
 }
 
+void SerialController::setInterrupt(SerialInterruptMode flg, bool isOn = true){
+    
+}
+
+void SerialController::setParityMode(SerialParityMode flg){
+
+}
+void SerialController::setStopBitMode(SerialStopBitMode flg){
+
+}
+void SerialController::setTranmitMode(SerialTranmitMode flg){
+
+}
+void SerialController::setFrameMode(SerialFrameMode flg){
+
+}

@@ -1,11 +1,14 @@
 #pragma once
 #include <stdint.h>
-
+#include <util/atomic.h>
+#ifndef CrlQueue
+#define CrlQueue
+#endif
 
 class Queue {
 private:
-    int front, rear, size;
-    uint8_t* items;
+    volatile int front, rear, size;
+    uint8_t *items;
 public:
     Queue(int size);
     ~Queue();

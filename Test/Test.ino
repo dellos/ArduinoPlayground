@@ -13,6 +13,8 @@
 #include <avr/interrupt.h>
 // #include "queue.h"
 #include "serial.h"
+#include "dataController.h"
+
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
 #include <util/setbaud.h>
@@ -20,7 +22,8 @@
 
 #define DoubleBaudRate 1
 
-SerialController serial = SerialController(128,128,UBRRL_VALUE,UBRRH_VALUE,USE_2X);
+
+volatile SerialController serial = SerialController(128,128,UBRRL_VALUE,UBRRH_VALUE,USE_2X);
 LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27,16,2);
 
 void serialInit(){
@@ -28,8 +31,8 @@ void serialInit(){
     serial.init(UBRRL_VALUE,UBRRH_VALUE,USE_2X);
 }
 //int queue for value
-void bufferInit(){
-
+void dataTranferInit(){
+        
 }
 
 void lcdInit(){
@@ -46,11 +49,14 @@ void setup(){
    
     serialInit();
     lcdInit();
+    
 }
-volatile char c;
+volatile uint8_t c;
+
 void loop(){
     // display each character to the LCD
     c = serial.readBuffer();
+    
     if(c != '\0'){
         serial.writeBuffer(c);
         lcd.print(c);
@@ -66,4 +72,7 @@ ISR(USART0_UDRE_vect){
 ISR(USART0_RX_vect){
     serial.read(); //move to serial buffer
 } 
+ISR(USART0_TX_vect){
+
+}
 
