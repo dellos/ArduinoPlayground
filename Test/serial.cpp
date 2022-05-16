@@ -203,7 +203,7 @@ void SerialController::init(unsigned long ubrrl_value, unsigned long ubrrh_value
     //Enable interupt
     UCSR0B |= (1<<UDRIE0); //empty transmit data  
     UCSR0B |= (1<<RXCIE0); //complete Revice
-    UCSR0B |= (1<<TXCIE0); //complete Transmit
+    //UCSR0B |= (1<<TXCIE0); //complete Transmit
 
     /* Set frame format: 8data, 2stop bit */
     UCSR0C = 0;

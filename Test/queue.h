@@ -1,19 +1,19 @@
 #pragma once
 #include <stdint.h>
-
+#include <util/atomic.h>
 
 class Queue {
 private:
-    int front, rear, size;
+    int8_t front, rear, size;
     uint8_t* items;
 public:
-    Queue(int size);
+    Queue(int8_t size);
     ~Queue();
     void enQueue(uint8_t value);
     uint8_t deQueue();
-    int findChar(char value);
+    int8_t findChar(char value);
     bool isFull();
     bool isEmpty();
     void resetQueue();
-    int capacity();
+    int8_t capacity();
 };
