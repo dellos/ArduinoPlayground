@@ -18,6 +18,7 @@
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
 #include <util/setbaud.h>
+#include <util/atomic.h>
 //#include <Wire.h>
 
 #define DoubleBaudRate 1
@@ -55,6 +56,10 @@ volatile uint8_t c;
 
 void loop(){
     // display each character to the LCD
+    char localC;
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE){
+        
+    }
     c = serial.readBuffer();
     
     if(c != '\0'){
@@ -76,3 +81,6 @@ ISR(USART0_TX_vect){
 
 }
 
+ISR(USART0_TX_vect){
+    //add???
+}

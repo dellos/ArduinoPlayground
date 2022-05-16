@@ -6,7 +6,7 @@
 //How enqueue and dequeue work if occurcue in sametime ??
 
 Queue::~Queue() {
-    delete items;
+    delete[] items;
 }
 Queue::Queue(int s) {
     front = -1;
