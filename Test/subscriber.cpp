@@ -13,3 +13,12 @@ Subscriber::Subscriber(){
     _handlerSlotSize = HANDLER_SLOT_SIZE;
     _nextIndex = 0;
 }
+Subscriber::~Subscriber(){
+    
+}
+void Subscriber::Subscribe(EventType eventType, EventHandler eventHandler){
+
+}
+void SubScriber::UnSubscribe(EventType eventType, EventHandler eventHandler){
+
+}
