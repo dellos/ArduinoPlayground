@@ -5,8 +5,6 @@
 
 EventHandler::EventHandler(){
     _nextIndex = 0;
-    handlerList = {};
-    _size = HANDLER_SZIE;
 }
 EventHandler::~EventHandler(){
     delete[] handlerList;

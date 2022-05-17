@@ -5,6 +5,9 @@
 
 */
 #pragma once
+#ifndef SERIAL_CONTROLLER
+#define SERIAL_CONTROLLER
+#endif
 #include "queue.h"
 #include "model.h"
 #include <avr/io.h>
@@ -26,7 +29,7 @@ class SerialController{
         void turnDataRegisterEmpty(bool flag);
         void setInterrupt(SerialInterruptMode flg,bool isOn);
         void setParityMode(SerialParityMode flg);
-        void setStopBitMode(SerialStopBit flg );
+        void setStopBitMode(SerialStopBitMode flg );
         void setTranmitMode(SerialTranmitMode flg);
         void setFrameMode(SerialFrameMode flg);
     public:

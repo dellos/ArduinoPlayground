@@ -2,7 +2,7 @@
 
 
 #pragma once
-#include "publisher.h"
+#include "dispatcher.h"
 
 Dispathcher::Dispathcher(uint8_t dispathEventSlot, uint8_t subscriberSlot ){
     _numOfSubscriber = subscriberSlot;

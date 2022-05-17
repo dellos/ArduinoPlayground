@@ -10,6 +10,6 @@ EventType::EventType(char descriptor){
 bool EventType::IsEqual(EventType t){
     return t.GetDescriptor() == _descriptor;
 }
-char EventType::GetDescription(){
+char EventType::GetDescriptor(){
     return _descriptor;
 }

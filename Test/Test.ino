@@ -6,19 +6,22 @@
     Count = OCRxx => which 16 bit register 65535 is max count
     ATMega is 32 bit microprocessor
 */
+#pragma once
 #define __AVR_ATmega2560__ //must define to use right io.h 
 #define BAUD 115200UL
 #define F_CPU 16000000UL
 #include <avr/io.h>
 #include <avr/interrupt.h>
-// #include "queue.h"
+#include "queue.h"
 #include "serial.h"
+#include "model.h"
 #include "dataController.h"
 
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
 #include <util/setbaud.h>
 #include <util/atomic.h>
+
 //#include <Wire.h>
 
 #define DoubleBaudRate 1
@@ -81,6 +84,4 @@ ISR(USART0_TX_vect){
 
 }
 
-ISR(USART0_TX_vect){
-    //add???
-}
+

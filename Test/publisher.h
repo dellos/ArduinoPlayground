@@ -1,6 +1,11 @@
 
 
 #pragma once
+#ifndef PUBLISHER
+#define PUBLISHER
+#endif
+#include <Arduino.h>
+#include "dispatcher.h"
 
 class Publisher{
     private:
@@ -10,4 +15,4 @@ class Publisher{
         ~Publisher();
         void PushEvent(Event e);//push event to Dispathcher
         
-}
+};

@@ -1,11 +1,13 @@
 
 
 #pragma once
-#include "event.h"
-
-#ifndef DispathEvent
-#define DispathEvent
+#ifndef DISPATHCHER
+#define DISPATHCHER
 #endif
+#include "event.h"
+#include "subscriber.h"
+#include <Arduino.h>
+
 class Dispathcher{
     private:
 
@@ -19,9 +21,9 @@ class Dispathcher{
          
 
     public:
-        Dispathcher(unsigned int dispathEventSlotSize, unsigned int subscriberSlotSize);
+        Dispathcher(uint8_t dispathEventSlotSize, uint8_t subscriberSlotSize);
         ~Dispathcher();
         void AddEvent();
         void Dispath();
         void RegistSubscriber();
-}
+};
