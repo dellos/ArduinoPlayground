@@ -8,7 +8,7 @@
 Queue::~Queue() {
     delete[] items;
 }
-Queue::Queue(int s) {
+Queue::Queue(int8_t s) {
     front = -1;
     rear = -1;
     size = s;
@@ -22,7 +22,7 @@ bool Queue::isFull() {
         r = rear;
         s = size;
     }
-    bool result = false;
+    bool result = false;  
     if (f == 0 && r == s - 1) {
         result = true;
     }
@@ -93,7 +93,7 @@ uint8_t Queue::deQueue() {
 //find c in queue then return front
 //if cant not find return -1
 //make sure not dequeue after call findChar or result will not match
-int Queue::findChar(char c) {
+int8_t Queue::findChar(char c) {
     int findNumber = c;
     int matchFront = -1; //frontIndex
     int count = -1;
@@ -123,7 +123,7 @@ void Queue::resetQueue() {
     rear = -1;
 }
 //return not using bytes
-int Queue::capacity() {
+int8_t Queue::capacity() {
     int f , r ,s;
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE){
         f = front;
