@@ -5,6 +5,9 @@
 
 */
 #pragma once
+#ifndef SERIAL_CONTROLLER
+#define SERIAL_CONTROLLER
+#endif
 #include "queue.h"
 #include "model.h"
 #include <avr/io.h>

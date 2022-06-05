@@ -103,7 +103,6 @@ void SerialController::stop(SerialPart flg){
 //1.enable Read/Write
 //2.enable OnEmptyTransmitDataRegister in case of transmit, becuase this interrupt fire evertime this register is emty
 void SerialController::resume(SerialPart flg){
-
      if(flg == SerialPart::All){
         setEnableRecive(true);
         setEnableTransmit(true);

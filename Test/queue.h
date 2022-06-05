@@ -1,9 +1,9 @@
 #pragma once
+#ifndef QUEUE
+#define QUEUE
+#endif
 #include <stdint.h>
 #include <util/atomic.h>
-#ifndef CrlQueue
-#define CrlQueue
-#endif
 
 class Queue {
 private:

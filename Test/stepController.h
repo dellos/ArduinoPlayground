@@ -5,6 +5,9 @@
     support 8 port
 */
 #pragma once
+#ifndef STEP_CONTROLLER
+#define STEP_CONTROLLER
+#endif
 #include "queue.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>

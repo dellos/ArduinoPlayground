@@ -8,6 +8,9 @@
 */
 
 #pragma once
+#ifndef DATA_CONTROLLER
+#define DATA_CONTROLLER
+#endif DATA_CONTROLLER
 #include "queue.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
